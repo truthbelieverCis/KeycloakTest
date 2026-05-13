@@ -1,0 +1,296 @@
+{
+  "realm": "fhir-demo",
+  "enabled": true,
+  "sslRequired": "none",
+  "registrationAllowed": false,
+  "roles": {
+    "client": {
+      "fhir-server": [
+        { "name": "pkg-core", "description": "Core Verkaufspaket (Flag, etc.)" },
+        { "name": "pkg-administrative", "description": "Administrative Verkaufspaket (Patient, Encounter, Practitioner, CareTeam, Coverage)" },
+        { "name": "pkg-medical-core", "description": "Medical Core Verkaufspaket (Medication, MedicationRequest, MedicationStatement, AllergyIntolerance, Condition)" }
+      ]
+    }
+  },
+  "groups": [
+    {
+      "name": "customer-hospital",
+      "clientRoles": {
+        "fhir-server": ["pkg-administrative", "pkg-medical-core"]
+      }
+    },
+    {
+      "name": "staff",
+      "clientRoles": {
+        "fhir-server": ["pkg-core", "pkg-administrative", "pkg-medical-core"]
+      }
+    }
+  ],
+  "users": [
+    {
+      "username": "dr.mueller@hospital.de",
+      "enabled": true,
+      "email": "dr.mueller@hospital.de",
+      "emailVerified": true,
+      "firstName": "Thomas",
+      "lastName": "Mueller",
+      "credentials": [{ "type": "password", "value": "test123", "temporary": false }],
+      "groups": ["/customer-hospital"],
+      "attributes": {
+        "PATNR": ["PAT-001"],
+        "FALLNR": ["FALL-2026-0042"],
+        "VISUM": ["TMU"],
+        "LOGINNAME": ["dr.mueller"]
+      }
+    },
+    {
+      "username": "schwester.anna@hospital.de",
+      "enabled": true,
+      "email": "schwester.anna@hospital.de",
+      "emailVerified": true,
+      "firstName": "Anna",
+      "lastName": "Schmidt",
+      "credentials": [{ "type": "password", "value": "test123", "temporary": false }],
+      "groups": ["/customer-hospital"],
+      "attributes": {
+        "PATNR": ["PAT-002"],
+        "FALLNR": ["FALL-2026-0099"],
+        "VISUM": ["ASC"],
+        "LOGINNAME": ["schwester.anna"]
+      }
+    },
+    {
+      "username": "dev@kis-hersteller.de",
+      "enabled": true,
+      "email": "dev@kis-hersteller.de",
+      "emailVerified": true,
+      "firstName": "Klaus",
+      "lastName": "Developer",
+      "credentials": [{ "type": "password", "value": "test123", "temporary": false }],
+      "groups": ["/staff"],
+      "attributes": {
+        "PATNR": [""],
+        "FALLNR": [""],
+        "VISUM": ["KDE"],
+        "LOGINNAME": ["dev.klaus"]
+      }
+    }
+  ],
+  "clientScopes": [
+    {
+      "name": "hospital-context",
+      "description": "Hospital-spezifische Claims: PATNR, FALLNR, VISUM, LOGINNAME",
+      "protocol": "openid-connect",
+      "attributes": { "include.in.token.scope": "true" },
+      "protocolMappers": [
+        {
+          "name": "PATNR-mapper",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "config": {
+            "user.attribute": "PATNR",
+            "claim.name": "PATNR",
+            "jsonType.label": "String",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "userinfo.token.claim": "true"
+          }
+        },
+        {
+          "name": "FALLNR-mapper",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "config": {
+            "user.attribute": "FALLNR",
+            "claim.name": "FALLNR",
+            "jsonType.label": "String",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "userinfo.token.claim": "true"
+          }
+        },
+        {
+          "name": "VISUM-mapper",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "config": {
+            "user.attribute": "VISUM",
+            "claim.name": "VISUM",
+            "jsonType.label": "String",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "userinfo.token.claim": "true"
+          }
+        },
+        {
+          "name": "LOGINNAME-mapper",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "config": {
+            "user.attribute": "LOGINNAME",
+            "claim.name": "LOGINNAME",
+            "jsonType.label": "String",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "userinfo.token.claim": "true"
+          }
+        }
+      ]
+    }
+  ],
+
+  "clients": [
+    {
+      "clientId": "fhir-server",
+      "name": "FHIR Resource Server",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "secret": "fhir-server-secret",
+      "serviceAccountsEnabled": true,
+      "authorizationServicesEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "standardFlowEnabled": false,
+      "authorizationSettings": {
+        "allowRemoteResourceManagement": true,
+        "policyEnforcementMode": "ENFORCING",
+        "decisionStrategy": "AFFIRMATIVE",
+        "scopes": [
+          { "name": "fhir:read" },
+          { "name": "fhir:write" },
+          { "name": "fhir:search" }
+        ],
+        "resources": [
+          {
+            "name": "core-resources",
+            "displayName": "Core FHIR Resources (Flag, etc.)",
+            "uris": ["/fhir/Flag", "/fhir/Flag/*"],
+            "scopes": [{ "name": "fhir:read" }, { "name": "fhir:write" }, { "name": "fhir:search" }]
+          },
+          {
+            "name": "administrative-resources",
+            "displayName": "Administrative FHIR Resources",
+            "uris": [
+              "/fhir/Patient", "/fhir/Patient/*",
+              "/fhir/Encounter", "/fhir/Encounter/*",
+              "/fhir/Practitioner", "/fhir/Practitioner/*",
+              "/fhir/CareTeam", "/fhir/CareTeam/*",
+              "/fhir/Coverage", "/fhir/Coverage/*"
+            ],
+            "scopes": [{ "name": "fhir:read" }, { "name": "fhir:write" }, { "name": "fhir:search" }]
+          },
+          {
+            "name": "medical-core-resources",
+            "displayName": "Medical Core FHIR Resources",
+            "uris": [
+              "/fhir/Medication", "/fhir/Medication/*",
+              "/fhir/MedicationRequest", "/fhir/MedicationRequest/*",
+              "/fhir/MedicationStatement", "/fhir/MedicationStatement/*",
+              "/fhir/AllergyIntolerance", "/fhir/AllergyIntolerance/*",
+              "/fhir/Condition", "/fhir/Condition/*"
+            ],
+            "scopes": [{ "name": "fhir:read" }, { "name": "fhir:write" }, { "name": "fhir:search" }]
+          }
+        ],
+        "policies": [
+          {
+            "name": "has-pkg-core",
+            "type": "role",
+            "logic": "POSITIVE",
+            "decisionStrategy": "UNANIMOUS",
+            "config": { "roles": "[{\"id\":\"fhir-server/pkg-core\",\"required\":true}]" }
+          },
+          {
+            "name": "has-pkg-administrative",
+            "type": "role",
+            "logic": "POSITIVE",
+            "decisionStrategy": "UNANIMOUS",
+            "config": { "roles": "[{\"id\":\"fhir-server/pkg-administrative\",\"required\":true}]" }
+          },
+          {
+            "name": "has-pkg-medical-core",
+            "type": "role",
+            "logic": "POSITIVE",
+            "decisionStrategy": "UNANIMOUS",
+            "config": { "roles": "[{\"id\":\"fhir-server/pkg-medical-core\",\"required\":true}]" }
+          },
+          {
+            "name": "is-ai-service-client",
+            "type": "client",
+            "logic": "POSITIVE",
+            "decisionStrategy": "UNANIMOUS",
+            "config": { "clients": "[\"ai-service\"]" }
+          },
+          {
+            "name": "core-permission",
+            "type": "resource",
+            "logic": "POSITIVE",
+            "decisionStrategy": "AFFIRMATIVE",
+            "config": {
+              "resources": "[\"core-resources\"]",
+              "applyPolicies": "[\"has-pkg-core\",\"is-ai-service-client\"]"
+            }
+          },
+          {
+            "name": "administrative-permission",
+            "type": "resource",
+            "logic": "POSITIVE",
+            "decisionStrategy": "AFFIRMATIVE",
+            "config": {
+              "resources": "[\"administrative-resources\"]",
+              "applyPolicies": "[\"has-pkg-administrative\",\"is-ai-service-client\"]"
+            }
+          },
+          {
+            "name": "medical-core-permission",
+            "type": "resource",
+            "logic": "POSITIVE",
+            "decisionStrategy": "AFFIRMATIVE",
+            "config": {
+              "resources": "[\"medical-core-resources\"]",
+              "applyPolicies": "[\"has-pkg-medical-core\",\"is-ai-service-client\"]"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "clientId": "hospital-api",
+      "name": "Hospital API Client (normaler Zugang fuer Krankenhaus-Mitarbeiter)",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": true,
+      "redirectUris": ["http://localhost:3000/*"],
+      "webOrigins": ["*"],
+      "defaultClientScopes": ["hospital-context"]
+    },
+    {
+      "clientId": "ai-service",
+      "name": "AI Service Application (nutzt Hospital-User, bekommt alle Pakete)",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "secret": "ai-service-secret",
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": false,
+      "redirectUris": ["http://localhost:4000/*"],
+      "webOrigins": ["*"],
+      "defaultClientScopes": ["hospital-context"]
+    },
+    {
+      "clientId": "kis-staff-app",
+      "name": "KIS Hersteller Staff App (alle Pakete via Staff-Gruppe)",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": true,
+      "redirectUris": ["http://localhost:3001/*"],
+      "webOrigins": ["*"],
+      "defaultClientScopes": ["hospital-context"]
+    }
+  ]
+}

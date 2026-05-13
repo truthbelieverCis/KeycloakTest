@@ -1,0 +1,21 @@
+meta {
+  name: 3. Medication lesen (Medical Core – erlaubt)
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{fhir_url}}/fhir/Medication/456
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{hospital_token}}
+}
+
+tests {
+  test("Zugriff auf Medication erlaubt (Hospital hat pkg-medical-core)", function() {
+    expect(res.status).to.equal(200);
+  });
+}

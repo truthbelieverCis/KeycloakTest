@@ -1,0 +1,37 @@
+meta {
+  name: 3. Alle Ressourcen verfuegbar (Staff hat alle Pakete)
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{keycloak_url}}/realms/{{realm}}/protocol/openid-connect/token
+  body: formUrlEncoded
+  auth: none
+}
+
+body:form-urlencoded {
+  grant_type: urn:ietf:params:oauth:grant-type:uma-ticket
+  audience: fhir-server
+  subject_token: {{staff_token}}
+}
+
+headers {
+  Authorization: Bearer {{staff_token}}
+}
+
+tests {
+  test("RPT erhalten – Staff hat Zugriff auf alle Ressourcen", function() {
+    expect(res.status).to.equal(200);
+  });
+
+  test("Alle Ressourcen-Gruppen in Permissions", function() {
+    const rpt = res.body.access_token;
+    const payload = JSON.parse(atob(rpt.split('.')[1]));
+    const permissions = payload.authorization?.permissions || [];
+    const names = permissions.map(p => p.rsname);
+    expect(names).to.include("core-resources");
+    expect(names).to.include("administrative-resources");
+    expect(names).to.include("medical-core-resources");
+  });
+}

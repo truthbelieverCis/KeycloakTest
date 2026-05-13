@@ -1,0 +1,21 @@
+meta {
+  name: 2. Flag lesen (Core – erlaubt fuer Staff)
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{fhir_url}}/fhir/Flag/789
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{staff_token}}
+}
+
+tests {
+  test("Staff kann Flag lesen (hat pkg-core)", function() {
+    expect(res.status).to.equal(200);
+  });
+}

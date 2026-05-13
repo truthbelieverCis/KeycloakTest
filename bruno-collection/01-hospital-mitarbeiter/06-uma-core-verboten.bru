@@ -1,0 +1,28 @@
+meta {
+  name: 6. UMA – Core verboten
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{keycloak_url}}/realms/{{realm}}/protocol/openid-connect/token
+  body: formUrlEncoded
+  auth: none
+}
+
+body:form-urlencoded {
+  grant_type: urn:ietf:params:oauth:grant-type:uma-ticket
+  audience: fhir-server
+  permission: core-resources#fhir:read
+  subject_token: {{hospital_token}}
+}
+
+headers {
+  Authorization: Bearer {{hospital_token}}
+}
+
+tests {
+  test("RPT fuer core-resources ABGELEHNT (403 – nicht gekauft)", function() {
+    expect(res.status).to.equal(403);
+  });
+}

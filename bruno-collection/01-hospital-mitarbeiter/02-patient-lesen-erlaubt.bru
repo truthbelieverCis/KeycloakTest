@@ -1,0 +1,21 @@
+meta {
+  name: 2. Patient lesen (Administrative – erlaubt)
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{fhir_url}}/fhir/Patient/123
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{hospital_token}}
+}
+
+tests {
+  test("Zugriff auf Patient erlaubt (Hospital hat pkg-administrative)", function() {
+    expect(res.status).to.equal(200);
+  });
+}

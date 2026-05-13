@@ -1,0 +1,36 @@
+meta {
+  name: 2. UMA – Core Resources (erlaubt via Client Policy)
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{keycloak_url}}/realms/{{realm}}/protocol/openid-connect/token
+  body: formUrlEncoded
+  auth: none
+}
+
+body:form-urlencoded {
+  grant_type: urn:ietf:params:oauth:grant-type:uma-ticket
+  audience: fhir-server
+  permission: core-resources#fhir:read
+  subject_token: {{ai_token}}
+}
+
+headers {
+  Authorization: Bearer {{ai_token}}
+}
+
+tests {
+  test("RPT fuer core-resources erhalten (Client Policy erlaubt ai-service)", function() {
+    expect(res.status).to.equal(200);
+    expect(res.body.access_token).to.be.a('string');
+  });
+
+  test("Vergleich: Gleicher User via hospital-api bekommt hier 403!", function() {
+    // Dieser Request gelingt NUR weil azp=ai-service ist
+    // und die Client Policy 'is-ai-service-client' greift.
+    // Via hospital-api wuerde pkg-core fehlen -> 403
+    expect(res.status).to.equal(200);
+  });
+}

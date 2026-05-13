@@ -1,0 +1,24 @@
+meta {
+  name: 4. Flag lesen (Core – NICHT gekauft – verboten)
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{fhir_url}}/fhir/Flag/789
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{hospital_token}}
+}
+
+tests {
+  test("Token hat KEIN pkg-core – Flag-Zugriff nicht erlaubt", function() {
+    const token = bru.getVar("hospital_token");
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    const roles = payload.resource_access?.["fhir-server"]?.roles || [];
+    expect(roles).to.not.include("pkg-core");
+  });
+}
