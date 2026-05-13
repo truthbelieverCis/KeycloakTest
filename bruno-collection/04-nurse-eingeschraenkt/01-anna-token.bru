@@ -1,0 +1,39 @@
+meta {
+  name: 1. Schwester Anna Token (nur pkg-administrative)
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{keycloak_url}}/realms/{{realm}}/protocol/openid-connect/token
+  body: formUrlEncoded
+  auth: none
+}
+
+body:form-urlencoded {
+  grant_type: password
+  client_id: hospital-api
+  username: schwester.anna@hospital.de
+  password: test123
+}
+
+script:post-response {
+  if (res.status === 200) {
+    bru.setVar("anna_token", res.body.access_token);
+  }
+}
+
+tests {
+  test("Token erhalten", function() {
+    expect(res.status).to.equal(200);
+  });
+
+  test("Anna hat NUR pkg-administrative (vom Admin so zugewiesen)", function() {
+    const token = res.body.access_token;
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    const roles = payload.resource_access?.["fhir-server"]?.roles || [];
+    expect(roles).to.include("pkg-administrative");
+    expect(roles).to.not.include("pkg-medical-core");
+    expect(roles).to.not.include("pkg-core");
+  });
+}

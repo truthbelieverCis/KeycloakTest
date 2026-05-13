@@ -1,0 +1,28 @@
+meta {
+  name: 3. UMA Medication (Medical Core – VERBOTEN)
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{keycloak_url}}/realms/{{realm}}/protocol/openid-connect/token
+  body: formUrlEncoded
+  auth: none
+}
+
+body:form-urlencoded {
+  grant_type: urn:ietf:params:oauth:grant-type:uma-ticket
+  audience: fhir-server
+  permission: medical-core-resources#fhir:read
+  subject_token: {{anna_token}}
+}
+
+headers {
+  Authorization: Bearer {{anna_token}}
+}
+
+tests {
+  test("Anna darf NICHT auf medical-core-resources (403)", function() {
+    expect(res.status).to.equal(403);
+  });
+}

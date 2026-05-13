@@ -15,9 +15,26 @@
   "groups": [
     {
       "name": "customer-hospital",
-      "clientRoles": {
-        "fhir-server": ["pkg-administrative", "pkg-medical-core"]
-      }
+      "subGroups": [
+        {
+          "name": "pkg-administrative-access",
+          "clientRoles": {
+            "fhir-server": ["pkg-administrative"]
+          }
+        },
+        {
+          "name": "pkg-medical-core-access",
+          "clientRoles": {
+            "fhir-server": ["pkg-medical-core"]
+          }
+        },
+        {
+          "name": "pkg-core-access",
+          "clientRoles": {
+            "fhir-server": ["pkg-core"]
+          }
+        }
+      ]
     },
     {
       "name": "staff",
@@ -35,7 +52,7 @@
       "firstName": "Thomas",
       "lastName": "Mueller",
       "credentials": [{ "type": "password", "value": "test123", "temporary": false }],
-      "groups": ["/customer-hospital"],
+      "groups": ["/customer-hospital/pkg-administrative-access", "/customer-hospital/pkg-medical-core-access"],
       "attributes": {
         "PATNR": ["PAT-001"],
         "FALLNR": ["FALL-2026-0042"],
@@ -51,7 +68,7 @@
       "firstName": "Anna",
       "lastName": "Schmidt",
       "credentials": [{ "type": "password", "value": "test123", "temporary": false }],
-      "groups": ["/customer-hospital"],
+      "groups": ["/customer-hospital/pkg-administrative-access"],
       "attributes": {
         "PATNR": ["PAT-002"],
         "FALLNR": ["FALL-2026-0099"],
