@@ -1,0 +1,28 @@
+meta {
+  name: 5. GET /fhir/Flag/789 (Core)
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{fhir_url}}/fhir/Flag/789
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{ai_cc_token}}
+}
+
+docs {
+  # Core Ressource: Flag
+  
+  Gehört zum Core-Paket (pkg-core).
+  AI Service darf zugreifen (Client Policy).
+  Schwester Anna (nur pkg-administrative) würde hier 403 bekommen.
+}
+
+tests {
+  test("Flag-Ressource abgerufen", function() {
+    expect(res.status).to.equal(200);
+  });
+}

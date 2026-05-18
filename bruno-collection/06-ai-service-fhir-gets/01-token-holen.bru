@@ -1,0 +1,29 @@
+meta {
+  name: 1. Token holen (Client Credentials)
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{keycloak_url}}/realms/{{realm}}/protocol/openid-connect/token
+  body: formUrlEncoded
+  auth: none
+}
+
+body:form-urlencoded {
+  grant_type: client_credentials
+  client_id: ai-service
+  client_secret: ai-service-secret
+}
+
+script:post-response {
+  if (res.status === 200) {
+    bru.setVar("ai_cc_token", res.body.access_token);
+  }
+}
+
+tests {
+  test("Token erhalten", function() {
+    expect(res.status).to.equal(200);
+  });
+}

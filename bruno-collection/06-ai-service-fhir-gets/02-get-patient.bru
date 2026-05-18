@@ -1,0 +1,39 @@
+meta {
+  name: 2. GET /fhir/Patient/123
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{fhir_url}}/fhir/Patient/123
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{ai_cc_token}}
+}
+
+docs {
+  # Realer FHIR-Aufruf: GET Patient
+  
+  Dies simuliert einen echten GET-Request an den FHIR-Server.
+  Der httpbin-Mock gibt immer 200 zurück und zeigt die gesendeten Headers.
+  
+  In der Realität würde der FHIR-Server:
+  1. Den Bearer Token validieren
+  2. Intern bei Keycloak via UMA prüfen: "Darf dieser Client/User auf Patient zugreifen?"
+  3. Bei Erfolg: Patient-Ressource zurückgeben
+  4. Bei Verweigerung: 403 Forbidden
+}
+
+tests {
+  test("FHIR-Server antwortet (Mock: httpbin echo)", function() {
+    expect(res.status).to.equal(200);
+  });
+
+  test("Authorization Header wurde mitgesendet", function() {
+    // httpbin gibt die empfangenen Headers im Body zurück
+    const headers = res.body.headers;
+    expect(headers.Authorization).to.include("Bearer ");
+  });
+}

@@ -1,0 +1,28 @@
+meta {
+  name: 4. UMA – Medical Core Resources (erlaubt)
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{keycloak_url}}/realms/{{realm}}/protocol/openid-connect/token
+  body: formUrlEncoded
+  auth: none
+}
+
+body:form-urlencoded {
+  grant_type: urn:ietf:params:oauth:grant-type:uma-ticket
+  audience: fhir-server
+  permission: medical-core-resources#fhir:read
+  subject_token: {{ai_cc_token}}
+}
+
+headers {
+  Authorization: Bearer {{ai_cc_token}}
+}
+
+tests {
+  test("RPT erhalten – medical-core-resources erlaubt", function() {
+    expect(res.status).to.equal(200);
+  });
+}

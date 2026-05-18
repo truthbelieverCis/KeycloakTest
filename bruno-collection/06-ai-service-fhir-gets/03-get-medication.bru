@@ -1,0 +1,32 @@
+meta {
+  name: 3. GET /fhir/Medication/456
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{fhir_url}}/fhir/Medication/456
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{ai_cc_token}}
+}
+
+docs {
+  # Realer FHIR-Aufruf: GET Medication
+  
+  Medical Core Ressource – AI Service hat Zugriff via Client Policy.
+  Ein normaler Hospital-User bräuchte das Paket "pkg-medical-core".
+}
+
+tests {
+  test("FHIR-Server antwortet", function() {
+    expect(res.status).to.equal(200);
+  });
+
+  test("Korrekte URL wurde aufgerufen", function() {
+    // httpbin gibt die aufgerufene URL zurück
+    expect(res.body.url).to.include("/fhir/Medication/456");
+  });
+}

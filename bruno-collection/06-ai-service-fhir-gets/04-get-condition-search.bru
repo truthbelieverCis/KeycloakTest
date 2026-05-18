@@ -1,0 +1,32 @@
+meta {
+  name: 4. GET /fhir/Condition (Search)
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{fhir_url}}/fhir/Condition?patient=Patient/123
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{ai_cc_token}}
+}
+
+docs {
+  # FHIR Search: Alle Conditions eines Patienten
+  
+  Zeigt einen typischen FHIR-Search-Aufruf mit Query-Parameter.
+  In der Realität würde der FHIR-Server hier den Scope "fhir:search"
+  auf "medical-core-resources" prüfen.
+}
+
+tests {
+  test("Search-Anfrage erfolgreich", function() {
+    expect(res.status).to.equal(200);
+  });
+
+  test("Query-Parameter korrekt gesendet", function() {
+    expect(res.body.url).to.include("patient=Patient/123");
+  });
+}

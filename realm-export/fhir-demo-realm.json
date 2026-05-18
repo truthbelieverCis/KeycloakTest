@@ -285,14 +285,14 @@
     },
     {
       "clientId": "ai-service",
-      "name": "AI Service Application (nutzt Hospital-User, bekommt alle Pakete)",
+      "name": "AI Service Application (nutzt Hospital-User oder Client Credentials)",
       "enabled": true,
       "protocol": "openid-connect",
       "publicClient": false,
       "secret": "ai-service-secret",
       "standardFlowEnabled": true,
       "directAccessGrantsEnabled": true,
-      "serviceAccountsEnabled": false,
+      "serviceAccountsEnabled": true,
       "redirectUris": ["http://localhost:4000/*"],
       "webOrigins": ["*"],
       "defaultClientScopes": ["hospital-context"]
