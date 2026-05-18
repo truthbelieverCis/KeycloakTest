@@ -1,0 +1,44 @@
+meta {
+  name: 7. Token OHNE scope (Rollen fehlen!)
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{keycloak_url}}/realms/{{realm}}/protocol/openid-connect/token
+  body: formUrlEncoded
+  auth: basic
+}
+
+auth:basic {
+  username: ai-service
+  password: ai-service-secret
+}
+
+body:form-urlencoded {
+  grant_type: client_credentials
+}
+
+tests {
+  test("Token erhalten (Auth funktioniert)", function() {
+    expect(res.status).to.equal(200);
+  });
+
+  test("KEINE pkg-Rollen im Token (scope nicht angefordert!)", function() {
+    const token = res.body.access_token;
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    const roles = payload.resource_access?.["fhir-server"]?.roles || [];
+    expect(roles).to.not.include("pkg-core");
+    expect(roles).to.not.include("pkg-administrative");
+    expect(roles).to.not.include("pkg-medical-core");
+  });
+
+  test("Beweis: Ohne scope=all-packages hat AI keinen FHIR-Zugriff", function() {
+    // Dieser Test zeigt Least Privilege:
+    // AI muss explizit alle Pakete anfordern
+    const token = res.body.access_token;
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    const roles = payload.resource_access?.["fhir-server"]?.roles || [];
+    expect(roles.length).to.equal(0);
+  });
+}
