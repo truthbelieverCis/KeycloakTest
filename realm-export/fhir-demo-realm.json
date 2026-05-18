@@ -153,6 +153,32 @@
           }
         }
       ]
+    },
+    {
+      "name": "all-packages",
+      "description": "Fuegt alle pkg-Rollen ins Token ein (fuer AI-Service – bekommt alle Pakete unabhaengig vom User)",
+      "protocol": "openid-connect",
+      "attributes": { "include.in.token.scope": "true" },
+      "protocolMappers": [
+        {
+          "name": "pkg-core-mapper",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-hardcoded-role-mapper",
+          "config": { "role": "fhir-server.pkg-core" }
+        },
+        {
+          "name": "pkg-administrative-mapper",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-hardcoded-role-mapper",
+          "config": { "role": "fhir-server.pkg-administrative" }
+        },
+        {
+          "name": "pkg-medical-core-mapper",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-hardcoded-role-mapper",
+          "config": { "role": "fhir-server.pkg-medical-core" }
+        }
+      ]
     }
   ],
 
@@ -232,20 +258,13 @@
             "config": { "roles": "[{\"id\":\"fhir-server/pkg-medical-core\",\"required\":true}]" }
           },
           {
-            "name": "is-ai-service-client",
-            "type": "client",
-            "logic": "POSITIVE",
-            "decisionStrategy": "UNANIMOUS",
-            "config": { "clients": "[\"ai-service\"]" }
-          },
-          {
             "name": "core-permission",
             "type": "resource",
             "logic": "POSITIVE",
             "decisionStrategy": "AFFIRMATIVE",
             "config": {
               "resources": "[\"core-resources\"]",
-              "applyPolicies": "[\"has-pkg-core\",\"is-ai-service-client\"]"
+              "applyPolicies": "[\"has-pkg-core\"]"
             }
           },
           {
@@ -255,7 +274,7 @@
             "decisionStrategy": "AFFIRMATIVE",
             "config": {
               "resources": "[\"administrative-resources\"]",
-              "applyPolicies": "[\"has-pkg-administrative\",\"is-ai-service-client\"]"
+              "applyPolicies": "[\"has-pkg-administrative\"]"
             }
           },
           {
@@ -265,7 +284,7 @@
             "decisionStrategy": "AFFIRMATIVE",
             "config": {
               "resources": "[\"medical-core-resources\"]",
-              "applyPolicies": "[\"has-pkg-medical-core\",\"is-ai-service-client\"]"
+              "applyPolicies": "[\"has-pkg-medical-core\"]"
             }
           }
         ]
@@ -285,7 +304,7 @@
     },
     {
       "clientId": "ai-service",
-      "name": "AI Service Application (nutzt Hospital-User oder Client Credentials)",
+      "name": "AI Service Application (bekommt alle Pakete via all-packages Client Scope)",
       "enabled": true,
       "protocol": "openid-connect",
       "publicClient": false,
@@ -295,7 +314,7 @@
       "serviceAccountsEnabled": true,
       "redirectUris": ["http://localhost:4000/*"],
       "webOrigins": ["*"],
-      "defaultClientScopes": ["hospital-context"]
+      "defaultClientScopes": ["hospital-context", "all-packages"]
     },
     {
       "clientId": "kis-staff-app",
